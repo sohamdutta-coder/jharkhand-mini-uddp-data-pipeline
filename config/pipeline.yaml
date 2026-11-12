@@ -1,0 +1,63 @@
+pipeline:
+  name: "Jharkhand Mini-UDDP Data Pipeline"
+  version: "1.0.0"
+
+  execution:
+    max_retries: 3
+    retry_delay_seconds: 2
+    backoff_multiplier: 2
+
+    fail_on_data_quality_errors: true
+
+  backfill:
+    enabled: true
+
+logging:
+  level: INFO
+  log_file: logs/pipeline.log
+  runs_directory: logs/pipeline_runs
+
+database:
+  client: psql
+  stop_on_sql_error: true
+
+stages:
+  bronze:
+    description: "Ingest public source files into Bronze"
+
+  silver:
+    description: "Build Silver dimensions and facts"
+    sql_files:
+      - sql/silver/001_build_dim_district.sql
+      - sql/silver/002_build_fact_district_demographics.sql
+      - sql/silver/003_build_fact_district_housing.sql
+      - sql/silver/004_build_fact_pension_beneficiaries.sql
+
+  source_validation:
+    description: "Validate source alignment"
+    sql_files:
+      - sql/quality/001_validate_district_source_alignment.sql
+      - sql/quality/002_validate_housing_source.sql
+
+  data_quality:
+    description: "Execute data quality checks and quarantine"
+
+  gold:
+    description: "Build the district pension outreach mart"
+    sql_files:
+      - sql/gold/001_build_mart_district_pension_outreach.sql
+
+  ml:
+    description: "Build the district ML feature dataset"
+    sql_files:
+      - sql/ml/001_build_ml_district_features.sql
+
+  export:
+    description: "Export Gold and ML datasets"
+    scripts:
+      - scripts/export_gold_mart.py
+      - scripts/export_ml_features.py
+
+alerts:
+  webhook_environment_variable: PIPELINE_ALERT_WEBHOOK
+  timeout_seconds: 5
