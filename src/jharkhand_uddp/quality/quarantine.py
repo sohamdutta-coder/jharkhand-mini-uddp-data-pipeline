@@ -380,6 +380,7 @@ def export_unmatched_districts(
         writer = csv.DictWriter(
             report_file,
             fieldnames=fieldnames,
+            lineterminator="\n",
         )
 
         writer.writeheader()

@@ -3,12 +3,10 @@
 import json
 import logging
 import sys
-
 from pathlib import Path
 from uuid import uuid4
 
 from sqlalchemy import text
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SOURCE_DIR = PROJECT_ROOT / "src"
@@ -16,12 +14,11 @@ SOURCE_DIR = PROJECT_ROOT / "src"
 sys.path.insert(0, str(SOURCE_DIR))
 
 
-from jharkhand_uddp.database.connection import (  # noqa: E402
+from jharkhand_uddp.database.connection import (
     dispose_engine,
     get_engine,
 )
-
-from jharkhand_uddp.quality.quarantine import (  # noqa: E402
+from jharkhand_uddp.quality.quarantine import (
     export_unmatched_districts,
     quarantine_source_records,
 )
@@ -49,7 +46,6 @@ def main() -> None:
         # Insert a temporary DQ run and synthetic Bronze record.
 
         with engine.begin() as connection:
-
             ingestion_id = connection.execute(
                 text(
                     """
@@ -113,10 +109,10 @@ def main() -> None:
         )
 
         with engine.connect() as connection:
-
-            quarantined_record = connection.execute(
-                text(
-                    """
+            quarantined_record = (
+                connection.execute(
+                    text(
+                        """
                     SELECT
                         reason_code,
                         reason_description,
@@ -125,23 +121,20 @@ def main() -> None:
                     FROM dq.quarantined_records
                     WHERE run_id = :run_id
                     """
-                ),
-                {"run_id": run_id},
-            ).mappings().one_or_none()
-
-        if quarantined_count != 1 or quarantined_record is None:
-            raise AssertionError(
-                "Expected exactly one quarantined record."
+                    ),
+                    {"run_id": run_id},
+                )
+                .mappings()
+                .one_or_none()
             )
 
-        if quarantined_record["reason_code"] != (
-            "DEMOGRAPHIC_DISTRICT_UNMATCHED"
-        ):
+        if quarantined_count != 1 or quarantined_record is None:
+            raise AssertionError("Expected exactly one quarantined record.")
+
+        if quarantined_record["reason_code"] != ("DEMOGRAPHIC_DISTRICT_UNMATCHED"):
             raise AssertionError("Unexpected quarantine reason.")
 
-        if quarantined_record["district_name"] != (
-            "Synthetic Test District"
-        ):
+        if quarantined_record["district_name"] != ("Synthetic Test District"):
             raise AssertionError("Original record was not preserved.")
 
         print("\nQUARANTINE TEST PASSED")
@@ -155,7 +148,6 @@ def main() -> None:
         # Remove all synthetic test data.
 
         with engine.begin() as connection:
-
             connection.execute(
                 text(
                     """

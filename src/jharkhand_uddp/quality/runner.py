@@ -230,6 +230,7 @@ def execute_data_quality(
         writer = csv.DictWriter(
             report_file,
             fieldnames=fieldnames,
+            lineterminator="\n",
         )
 
         writer.writeheader()
