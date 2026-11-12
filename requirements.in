@@ -1,0 +1,16 @@
+# Data processing
+pandas>=2.2,<4.0
+
+# Database connectivity
+SQLAlchemy>=2.0,<3.0
+psycopg[binary]>=3.2,<4.0
+
+# Configuration management
+python-dotenv>=1.0,<2.0
+PyYAML>=6.0,<7.0
+
+# HTTP ingestion
+requests>=2.32,<3.0
+
+# Retry mechanisms
+tenacity>=9.0,<10.0

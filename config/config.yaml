@@ -1,0 +1,18 @@
+project:
+  name: "Jharkhand Mini UDDP Data Pipeline"
+  version: "0.1.0"
+  timezone: "UTC"
+
+paths:
+  raw_data: "data/raw"
+  outputs: "outputs"
+  reports: "reports"
+  logs: "logs"
+
+database:
+  schemas:
+    bronze: "bronze"
+    silver: "silver"
+    gold: "gold"
+    ml: "ml"
+    dq: "dq"
