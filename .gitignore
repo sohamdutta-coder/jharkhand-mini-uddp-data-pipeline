@@ -27,7 +27,7 @@ env/
 logs/
 
 # Local source data
-data/raw/
+
 data/landing/
 
 # Database backups
